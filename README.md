@@ -283,9 +283,9 @@ p <- ggplot() +
     coord_equal() +
     theme( legend.position = "bottom", legend.title = element_text( size = 18, hjust = 0.5),
         legend.text = element_text( size = 14), plot.title = element_text( size = 18, hjust = 0.5)) +
-    labs( x = NULL, y = NULL, title = "Physiotherapists/Population Tax in Rio Grande do Sul - Brazil - Source: Crefito and IBGE, 2019.") +
+    labs( x = NULL, y = NULL, title = "Population/Physiotherapists Rate in Rio Grande do Sul - Brazil - Source: Crefito and IBGE, 2019.") +
     scale_fill_manual( values = rev(colorRampPalette(brewer.pal(5, "Spectral"))(5)),
-        name = "People by Physiotherapists",
+        name = "People / Physiotherapists Rate",
         drop = FALSE,
         guide = guide_legend(
             direction = "horizontal",
