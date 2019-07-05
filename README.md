@@ -3,6 +3,7 @@
 # Summary
 
 This project aims to explore through maps the number of Physiotherapists in the municipalities of Rio Grande do Sul state, from Brazil. The challenge here is that all the data available about the Physiotherapists were found just in .pdf format. You can [download](http://www.crefito5.org.br/wp-content/uploads/2019/06/total-por-municipio.pdf) the file from Crefito - RS to see and understand why is hard to automatic get all the data. In our case, we will see that is not possible.
+
 Open your RStudio or other IDE with R language. Set you directory as the working directory with the RStudio or you can do this using:
 ```R
 setwd("working_directory")
