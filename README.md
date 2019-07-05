@@ -8,7 +8,7 @@ Open your RStudio or other IDE with R language. Set your directory as the workin
 ```R
 setwd("working_directory")
 ```
-We will load the packages that we will need first.
+We load the packages that we will need first.
 
 ```R
 if (!require(pdftools)) {
