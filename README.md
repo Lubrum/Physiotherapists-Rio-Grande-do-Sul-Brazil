@@ -1,4 +1,4 @@
-# Physiotherapists-Rio-Grande-do-Sul-Brazil
+# Physiotherapists in Rio Grande do Sul - Brazil
 
 # Summary
 
