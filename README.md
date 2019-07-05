@@ -53,17 +53,17 @@ We got the data in the following format:
 
 ![Alt text](figures/figure1.png?raw=true "Title")
 
-Next, we need to remove the lines with useless information. For that, we use *grep* function to get those lines.
+Next, we need to remove the lines with useless information. For that, we use **grep** function to get those lines.
 ```R
 file_pdf <- file_pdf[-(grep("QUANTIDADE", file_pdf))]
 file_pdf <- file_pdf[-(grep("Página", file_pdf))]
 file_pdf <- file_pdf[-(grep("Quantidade", file_pdf))]
 ```
-Now we split each line of the file using *strsplit* function, using spaces as the separator.
+Now we split each line of the file using **strsplit** function, using spaces as the separator.
 ```R
 file_pdf <- strsplit(file_pdf, "  ")
 ```
-Some lines got the *character(0)*. We set them to NULL to remove them from the list.
+Some lines got the **character(0)**. We set them to NULL to remove them from the list.
 ```R
 file_pdf[which((lapply(file_pdf,length)==0) == TRUE)] <- NULL
 ```
@@ -79,7 +79,7 @@ for(i in 1:length(file_pdf)){
     }
 }
 ```
-We will simulate a dataframe with four colunms using the list. If you check the pdf, you will see four colunms, but beside the city names we do not have any information. So, we will insert beside the name of each city a special symbol that we will use after. To identify the name of each citiy, we will use the *grepl* function, that allow us to identify capitalized words (cities have its names capitalized). We use *str_replace_all* to remove spaces and special characters from the city names and *append* to insert the special symbol in the list.
+We will simulate a dataframe with four colunms using the list. If you check the pdf, you will see four colunms, but beside the city names we do not have any information. So, we will insert beside the name of each city a special symbol that we will use after. To identify the name of each citiy, we will use the **grepl** function, that allow us to identify capitalized words (cities have its names capitalized). We use **str_replace_all** to remove spaces and special characters from the city names and **append** to insert the special symbol in the list.
 ```R
 for(i in 1:(length(list_pdf)+600)){
     aux <- grepl("^[[:upper:]]+$", str_replace_all(str_replace_all(str_replace_all(list_pdf[i], fixed(" "), ""),fixed("."), ""),"-",""))
@@ -245,7 +245,7 @@ shape_rs@data$id <- c(1:nrow(shape_rs@data))
 shapefile_df <- fortify(shape_rs, region = 'id') %>% mutate(id = as.numeric(id))
 shapefile_df<-sp::merge(shapefile_df, shape_rs@data,all = TRUE,by="id")
 ```
-And here we need to back again to the *we almost always have the pattern <Information, value, Information, value>*. There are some cases that it is not true. The cases are when we have one City in position 'i' and other City in position 'i + 4'. This problem do not allow us to algorithmically read the data for this cities, corrupting information for some of the next cities from the list too. The remaining alternative was to manually check the pdf file and compare it with the dataframe, and correct the wrong data. You can see an example above, but the full code is available in my project page. 
+And here we need to back again to the **we almost always have the pattern <Information, value, Information, value>**. There are some cases that it is not true. The cases are when we have one City in position 'i' and other City in position 'i + 4'. This problem do not allow us to algorithmically read the data for this cities, corrupting information for some of the next cities from the list too. The remaining alternative was to manually check the pdf file and compare it with the dataframe, and correct the wrong data. You can see an example above, but the full code is available in my project page. 
 ```R
 data_pdf$Physiotherapist[data_pdf$City=="alegria"] <- 0
 data_pdf$Physiotherapist[data_pdf$City=="arroio do sal"] <- 9
