@@ -323,9 +323,9 @@ p2 <- ggplot()+
     )
 ```
 
-![Alt text](figures/figure2.png?raw=true "Title")
+![Alt text](figures/figure2.jpeg?raw=true "Title")
 
-![Alt text](figures/figure3.png?raw=true "Title")
+![Alt text](figures/figure3.jpeg?raw=true "Title")
 
 Of course, we can save the data in .csv format or other to save us in the future from having exceptional effort to organize this data again.
 That's it. Thank you guys and share it with your mates !!
