@@ -44,7 +44,7 @@ if (!require(dplyr)) {
   require(dplyr)
 }
 ```
-First we deal with the pdf file. we load it to RStudio. 
+First we deal with the pdf file loading it to RStudio. 
 
 ```R
 file_pdf <- pdf_text("Physioterapists_by_city.pdf") %>% read_lines()
