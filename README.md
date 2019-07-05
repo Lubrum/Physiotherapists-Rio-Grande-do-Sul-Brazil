@@ -79,7 +79,7 @@ for(i in 1:length(file_pdf)){
     }
 }
 ```
-We will simulate a dataframe with four colunms using the list. IF you check the pdf, you will se four colunms, but beside the city names we do not have any information. So, we will insert beside the name of each city a special symbol that we will use after. To identify the city name, we will use the *grepl* function to identify capitalized words (cities have its names capitalized), *str_replace_all* to remove spaces and special characters from the city names and *append* to insert the special symbol in the list.
+We will simulate a dataframe with four colunms using the list. If you check the pdf, you will see four colunms, but beside the city names we do not have any information. So, we will insert beside the name of each city a special symbol that we will use after. To identify the name of each citiy, we will use the *grepl* function, that allow us to identify capitalized words (cities have its names capitalized). We use *str_replace_all* to remove spaces and special characters from the city names and *append* to insert the special symbol in the list.
 ```R
 for(i in 1:(length(list_pdf)+600)){
     aux <- grepl("^[[:upper:]]+$", str_replace_all(str_replace_all(str_replace_all(list_pdf[i], fixed(" "), ""),fixed("."), ""),"-",""))
@@ -88,16 +88,16 @@ for(i in 1:(length(list_pdf)+600)){
     }
 }
 ```
-We create a dataframe that will receive all the data from the list.
+We create a dataframe that will receive all data from the list.
 ```R
 data_pdf <- data.frame(stringsAsFactors = FALSE, "City" = list_pdf[grepl("^[[:upper:]]+$", 
 str_replace_all(str_replace_all(str_replace_all(list_pdf, fixed(" "), ""),fixed("."), ""),"-","")) == TRUE], 
 "Clinic" = 0, "Company" = 0, "Physiotherapist" = 0, "PhilanthropicEntity" = 0, "PublicAgency" = 0, "OccupationalTherapist" = 0)
 ```
-The most important and difficult part arises: the need to seperate what data is City, or number, or metadata, and so on. We first will check every string of the list. If it is a city, we proceed to the next step: we check if the city is "VILA MARIA". Why? you may ask. This city is a marker of the last page, that has only one colunm, and there the reading pattern changes.
+The most important and difficult part arises: the need to seperate what data is a city, or number, or metadata, and so on. We first check every string of the list. If it is a city, we proceed to the next step: we check if the city is "VILA MARIA". Why? you may ask. This city is a marker of the last page, that has only one colunm, and there the reading pattern changes.
 After that, we use an increment to read the lines next to the city name. We use +4 to read exactly the register above the city name, and +2 to do the same with the registers from the last page.
-The while loop identifies if: count > 6 means that we read all six essential information about the city, no need to continue; and if the register is not a city, because if it is, we need to stop because we already read everything for the previous city.
-Everything in the while loop just verify the information in the current list element to know where to put in the dataframe. See that we almost always has the pattern <Information, value, Information, value>. This almost is sadly our source of failing that we will show next.
+The while loop checks: count > 6 means that we read all six essential information about the city, no need to continue; and if the register is not a city, because if it is, we need to stop because we already read everything for the current city.
+Everything in the while loop just verify the information in the current list element to know where to put in the dataframe. See that we almost always have the pattern <Information, value, Information, value>. This "almost" is sadly our source of failing that we will show next.
 ```R
 marker <- 0
 count <- 0
@@ -144,7 +144,7 @@ for(i in 1:length(list_pdf)){
     }
 }
 ```
-You can see that some city names are wrong. To correct them, we will first get the shapefiles data, and with them, the city names. But first, we will get the [population](https://sidra.ibge.gov.br/tabela/200) data from IBGE and merge it with the shapefile (of course, first some cleaning).
+You can see that some city names are wrong. To correct them, we will first get the shapefiles data, and with them, the city names. But first, we will get the [population](https://sidra.ibge.gov.br/tabela/200) data from IBGE and merge it with the shapefile (of course, we need first to do some cleaning).
 ```R
 population_rs <- read.csv2('spreadsheets/table200_pop.csv', skip=6, stringsAsFactors = FALSE, encoding="UTF-8")
 population_rs<-population_rs[-(497:508),]
@@ -239,13 +239,13 @@ data_pdf$Company[is.na(data_pdf$Company)]<-0
 data_pdf$Clinic <- as.numeric(as.character(data_pdf$Clinic))
 data_pdf$Clinic[is.na(data_pdf$Clinic)]<-0
 ```
-To create maps with *ggplot*, we need to transform to dataframe format.
+To create maps with *ggplot*, we need to transform the shapefile to dataframe format.
 ```R
 shape_rs@data$id <- c(1:nrow(shape_rs@data))
 shapefile_df <- fortify(shape_rs, region = 'id') %>% mutate(id = as.numeric(id))
 shapefile_df<-sp::merge(shapefile_df, shape_rs@data,all = TRUE,by="id")
 ```
-And here we need to back again to the *we almost always has the pattern <Information, value, Information, value>*. There are some cases that it is not true. The cases are when we have one City in position 'i' and other City in position 'i + 4'. This problem do not allow us to algorithmically read the data for this cities, corrupting information for some of the next cities from the list too. The remaining alternative was to manually check the pdf file and compare it with the dataframe, and correct the wrong data. You can see an example above, but the full code is available in my project page. 
+And here we need to back again to the *we almost always have the pattern <Information, value, Information, value>*. There are some cases that it is not true. The cases are when we have one City in position 'i' and other City in position 'i + 4'. This problem do not allow us to algorithmically read the data for this cities, corrupting information for some of the next cities from the list too. The remaining alternative was to manually check the pdf file and compare it with the dataframe, and correct the wrong data. You can see an example above, but the full code is available in my project page. 
 ```R
 data_pdf$Physiotherapist[data_pdf$City=="alegria"] <- 0
 data_pdf$Physiotherapist[data_pdf$City=="arroio do sal"] <- 9
@@ -326,6 +326,9 @@ p2 <- ggplot()+
 ![Alt text](figures/figure2.png?raw=true "Title")
 
 ![Alt text](figures/figure3.png?raw=true "Title")
+
+Of course, we can save the data in .csv format or other to save us in the future from having exceptional effort to organize this data again.
+That's it. Thank you guys and share it with your mates !!
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
