@@ -95,7 +95,7 @@ str_replace_all(str_replace_all(str_replace_all(list_pdf, fixed(" "), ""),fixed(
 "Clinic" = 0, "Company" = 0, "Physiotherapist" = 0, "PhilanthropicEntity" = 0, "PublicAgency" = 0, "OccupationalTherapist" = 0)
 ```
 The most important and difficult part arises: the need to seperate what data is a city, or number, or metadata, and so on. We first check every string of the list. If it is a city, we proceed to the next step: we check if the city is "VILA MARIA". Why? you may ask. This city is a marker of the last page, that has only one colunm, and there the reading pattern changes.
-After that, we use an increment to read the lines next to the city name. We use +4 to read exactly the register above the city name, and +2 to do the same with the registers from the last page.
+After that, we use an increment to read the lines next to the city name. We use +4 to read exactly the register below the city name, and +2 to do the same with the registers from the last page.
 The while loop checks: count > 6 means that we read all six essential information about the city, no need to continue; and if the register is not a city, because if it is, we need to stop because we already read everything for the current city.
 Everything in the while loop just verify the information in the current list element to know where to put in the dataframe. See that we almost always have the pattern <Information, value, Information, value>. This "almost" is sadly our source of failing that we will show next.
 ```R
@@ -245,7 +245,7 @@ shape_rs@data$id <- c(1:nrow(shape_rs@data))
 shapefile_df <- fortify(shape_rs, region = 'id') %>% mutate(id = as.numeric(id))
 shapefile_df<-sp::merge(shapefile_df, shape_rs@data,all = TRUE,by="id")
 ```
-And here we need to back again to the **we almost always have the pattern <Information, value, Information, value>**. There are some cases that it is not true. The cases are when we have one City in position 'i' and other City in position 'i + 4'. This problem do not allow us to algorithmically read the data for this cities, corrupting information for some of the next cities from the list too. The remaining alternative was to manually check the pdf file and compare it with the dataframe, and correct the wrong data. You can see an example above, but the full code is available in my project page. 
+And here we need to back again to the **we almost always have the pattern <Information, value, Information, value>**. There are some cases that it is not true. The cases are when we have one City in position 'i' and other City in position 'i + 4'. This problem do not allow us to algorithmically read the data for this cities, corrupting information for some of the next cities from the list too. The remaining alternative was to manually check the pdf file and compare it with the dataframe, and correct the wrong data. You can see an example below, but the full code is available in my project page. 
 ```R
 data_pdf$Physiotherapist[data_pdf$City=="alegria"] <- 0
 data_pdf$Physiotherapist[data_pdf$City=="arroio do sal"] <- 9
