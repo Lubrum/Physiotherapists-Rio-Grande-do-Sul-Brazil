@@ -11,38 +11,24 @@ setwd("working_directory")
 We load the packages that we will need first.
 
 ```R
-if (!require(pdftools)) {
-  install.packages("pdftools", repos = "http://cran.us.r-project.org")
-  require(pdftools)
-}
-if (!require(readr)) {
-  install.packages("readr", repos = "http://cran.us.r-project.org")
-  require(readr)
-}
-if (!require(stringi)) {
-  install.packages("stringi", repos = "http://cran.us.r-project.org")
-  require(stringi)
-}
-if (!require(stringr)) {
-  install.packages("stringr", repos = "http://cran.us.r-project.org")
-  require(stringr)
-}
-if (!require(ggplot2)) {
-  install.packages("ggplot2", repos = "http://cran.us.r-project.org")
-  require(ggplot2)
-}
-if(!require(RColorBrewer)){
-    install.packages("RColorBrewer")
-    library(RColorBrewer)
-}
-if (!require(rgdal)) {
-  install.packages("rgdal", repos = "http://cran.us.r-project.org")
-  require(rgdal)
-}
-if (!require(dplyr)) {
-  install.packages("dplyr", repos = "http://cran.us.r-project.org")
-  require(dplyr)
-}
+if(!require(pdftools)) install.packages('pdftools')
+library(pdftools)
+if(!require(readr)) install.packages('readr')
+library(readr)
+if(!require(stringi)) install.packages('stringi')
+library(stringi)
+if(!require(stringr)) install.packages('stringr')
+library(stringr)
+if(!require(ggplot2)) install.packages('ggplot2')
+library(ggplot2)
+if(!require(plotly)) install.packages('plotly')
+library(plotly)
+if(!require(RColorBrewer)) install.packages('RColorBrewer')
+library(RColorBrewer)
+if(!require(rgdal)) install.packages('rgdal')
+library(rgdal)
+if(!require(dplyr)) install.packages('dplyr')
+library(dplyr)
 ```
 First we deal with the pdf file loading it to RStudio. 
 
@@ -278,8 +264,7 @@ shape_rs$cat2 <- factor(shape_rs$cat2, levels = c(5:1), labels = c("2143 - 43652
 And finally, the two final maps about the physiotherapists in Rio Grande do Sul cities, from Brazil.
 ```R
 p <- ggplot() +
-    geom_polygon( data = shape_rs, aes( fill = cat2, group = group, x = long, y = lat)) +
-    geom_path( data = shape_rs, aes( x = long, y = lat, group = group), color = "black", size = 0.1) +
+    geom_polygon( data = shape_rs, aes( fill = cat2, group = group, x = long, y = lat ), color = "black", size = 0.1) +
     coord_equal() +
     theme( legend.position = "bottom", legend.title = element_text( size = 18, hjust = 0.5),
         legend.text = element_text( size = 14), plot.title = element_text( size = 18, hjust = 0.5)) +
@@ -300,8 +285,7 @@ p <- ggplot() +
     )
 
 p2 <- ggplot()+
-    geom_polygon(data = shape_rs, aes(fill = cat, group = group, x = long, y = lat)) +
-    geom_path(data = shape_rs, aes(x = long, y = lat, group = group), color = "black", size = 0.1) +
+    geom_polygon(data = shape_rs, aes(fill = cat, group = group, x = long, y = lat), color = "black", size = 0.1) +
     coord_equal() +
     theme(legend.position = "bottom", legend.title = element_text(size = 18, hjust = 0.5),
         legend.text = element_text(size = 14), plot.title = element_text(size = 18, hjust = 0.5)) +
