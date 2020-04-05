@@ -4,36 +4,45 @@
 
 This project aims to explore through maps the number of Physiotherapists in the municipalities of Rio Grande do Sul state, from Brazil. The challenge here is that all the data available about the Physiotherapists were found just in .pdf format. You can [download](http://www.crefito5.org.br/wp-content/uploads/2019/06/total-por-municipio.pdf) the file from Crefito - RS to see and understand why is hard to automatic get all the data. In our case, we will see that is not possible.
 
-Open your RStudio or other IDE with R language. Set your directory as the working directory with the RStudio or you can do this using:
+Open your RStudio. Set the code.r path as the working directory with the RStudio or you can do this using the code above :
 ```R
-setwd("working_directory")
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 ```
 We load the packages that we will need first.
 
 ```R
 if(!require(pdftools)) install.packages('pdftools')
 library(pdftools)
+
 if(!require(readr)) install.packages('readr')
 library(readr)
+
 if(!require(stringi)) install.packages('stringi')
 library(stringi)
+
 if(!require(stringr)) install.packages('stringr')
 library(stringr)
+
 if(!require(ggplot2)) install.packages('ggplot2')
 library(ggplot2)
+
 if(!require(plotly)) install.packages('plotly')
 library(plotly)
+
 if(!require(RColorBrewer)) install.packages('RColorBrewer')
 library(RColorBrewer)
+
 if(!require(rgdal)) install.packages('rgdal')
 library(rgdal)
+
 if(!require(dplyr)) install.packages('dplyr')
 library(dplyr)
 ```
 First we deal with the pdf file loading it to RStudio. 
 
 ```R
-file_pdf <- pdf_text("Physioterapists_by_city.pdf") %>% read_lines()
+file_pdf_path <- "../pdf/total-por-municipio.pdf"
+file_pdf <- pdf_text(file_pdf_path) %>% read_lines()
 ```
 We got the data in the following format:
 
@@ -132,7 +141,8 @@ for(i in 1:length(list_pdf)){
 ```
 You can see that some city names are wrong. To correct them, we will first get the shapefiles data, and with them, the city names. But first, we will get the [population](https://sidra.ibge.gov.br/tabela/200) data from IBGE and merge it with the shapefile (of course, we need first to do some cleaning).
 ```R
-population_rs <- read.csv2('spreadsheets/table200_pop.csv', skip=6, stringsAsFactors = FALSE, encoding="UTF-8")
+population_rs_path <- '../spreadsheets/table200_pop.csv'
+population_rs <- read.csv2(population_rs_path, skip = 6, stringsAsFactors = FALSE, encoding="UTF-8")
 population_rs<-population_rs[-(497:508),]
 colnames(population_rs)[1] <- "Cities"
 colnames(population_rs)[3] <- "Population"
@@ -143,7 +153,8 @@ population_rs[,2]<-gsub("[-]","0",population_rs[,2])
 population_rs[,2]<-as.numeric(as.character(unlist(population_rs[,2])))
 population_rs[,1]<-gsub(" [(]RS[)]","",population_rs[,1])
 
-shape_rs <- readOGR("shapes/Municipios_IBGE.shp", "Municipios_IBGE",use_iconv=TRUE, encoding="UTF-8")
+shape_rs_path <- "../shapes/Municipios_IBGE.shp"
+shape_rs <- readOGR(shape_rs_path, "Municipios_IBGE", use_iconv = TRUE, encoding = "UTF-8")
 
 shape_rs@data[!shape_rs@data$Label_N %in% population_rs$Cities,]
 
@@ -263,23 +274,37 @@ shape_rs$cat2 <- factor(shape_rs$cat2, levels = c(5:1), labels = c("2143 - 43652
 ```
 And finally, the two final maps about the physiotherapists in Rio Grande do Sul cities, from Brazil.
 ```R
+theme <- theme( legend.position = "bottom", 
+                legend.title = element_text(size = 18, hjust = 0.5, color = "white"),
+                legend.text = element_text(size = 10, color = "white"), 
+                legend.background = element_rect(fill = "black"),
+                plot.title = element_text(size = 18, hjust = 0.5, color = "white"),
+                plot.caption = element_text(color = "white"),
+                plot.background = element_rect(fill = "black"),
+                panel.background = element_rect(fill = "black"),
+                panel.grid.major = element_line(size =.1, color = "grey" ),
+                panel.grid.minor = element_line(size =.1, color = "grey" ),
+                panel.border = element_blank(),
+                axis.text = element_text(color = "white"),
+                axis.title = element_text(color = "white"))
+                
 p <- ggplot() +
-    geom_polygon( data = shape_rs, aes( fill = cat2, group = group, x = long, y = lat ), color = "black", size = 0.1) +
+    geom_polygon( data = shape_rs, aes( fill = cat2, x = long, y = lat, group = group), color = "black", size = 0.1) +
     coord_equal() +
-    theme( legend.position = "bottom", legend.title = element_text( size = 18, hjust = 0.5),
-        legend.text = element_text( size = 14), plot.title = element_text( size = 18, hjust = 0.5)) +
-    labs( x = NULL, y = NULL, title = "Population/Physiotherapists Rate in Rio Grande do Sul - Brazil - Source: Crefito and IBGE, 2019.") +
+    theme +
+    labs( x = "Latitude", y = "Longitude", title = "Population/Physiotherapists Rate in Rio Grande do Sul - Brazil", caption = "Source: Crefito and IBGE, 2019.") +
     scale_fill_manual( values = rev(colorRampPalette(brewer.pal(5, "Spectral"))(5)),
-        name = "People / Physiotherapists Rate",
-        drop = FALSE,
-        guide = guide_legend(
+    name = "People / Physiotherapists Rate",
+    drop = FALSE,
+    guide = guide_legend(
             direction = "horizontal",
-            keyheight = unit( 6, units = "mm"), keywidth = unit( 40, units = "mm"),
+            keyheight = unit( 4, units = "mm"), keywidth = unit( 20, units = "mm"),
             title.position = 'top',
             title.hjust = 0.5,
             label.hjust = 0.5,
             nrow = 1,
-            byrow = T,reverse = T,
+            byrow = T,
+            reverse = T,
             label.position = "bottom"
         )
     )
@@ -287,21 +312,21 @@ p <- ggplot() +
 p2 <- ggplot()+
     geom_polygon(data = shape_rs, aes(fill = cat, group = group, x = long, y = lat), color = "black", size = 0.1) +
     coord_equal() +
-    theme(legend.position = "bottom", legend.title = element_text(size = 18, hjust = 0.5),
-        legend.text = element_text(size = 14), plot.title = element_text(size = 18, hjust = 0.5)) +
-    labs(x = NULL, y = NULL, title = "Physiotherapists in Rio Grande do Sul - Brazil - Source: Crefito and IBGE, 2019.") +
+    theme  +
+    labs(x = "Latitude", y = "Longitude", title = "Physiotherapists in Rio Grande do Sul - Brazil", caption = "Source: Crefito and IBGE, 2019.") +
     scale_fill_manual(
         values = rev(colorRampPalette(brewer.pal(5, "Greens"))(5)),
         name = "Physiotherapists Number",
         drop = FALSE,
         guide = guide_legend(
             direction = "horizontal",
-            keyheight = unit(6, units = "mm"),keywidth = unit(40, units = "mm"),
+            keyheight = unit(5, units = "mm"), keywidth = unit(20, units = "mm"),
             title.position = 'top',
             title.hjust = 0.5,
             label.hjust = 0.5,
             nrow = 1,
-            byrow = T,reverse = T,
+            byrow = T,
+            reverse = T,
             label.position = "bottom"
         )
     )

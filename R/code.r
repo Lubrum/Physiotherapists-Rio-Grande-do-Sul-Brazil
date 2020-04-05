@@ -1,23 +1,46 @@
+#Created by: Luciano Brum
+#Last modified: 5 apr, 2020
+
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
+#If failed, is because poppler-cpp was not found. Try installing:
+# * deb: libpoppler-cpp-dev (Debian, Ubuntu, etc)
+# * On Ubuntu 16.04 or 18.04 use this PPA:
+#    sudo add-apt-repository -y ppa:cran/poppler
+#    sudo apt-get update
+#    sudo apt-get install -y libpoppler-cpp-dev
+# * rpm: poppler-cpp-devel (Fedora, CentOS, RHEL)
+# * csw: poppler_dev (Solaris)
+# * brew: poppler (Mac OSX)
 if(!require(pdftools)) install.packages('pdftools')
 library(pdftools)
+
 if(!require(readr)) install.packages('readr')
 library(readr)
+
 if(!require(stringi)) install.packages('stringi')
 library(stringi)
+
 if(!require(stringr)) install.packages('stringr')
 library(stringr)
+
 if(!require(ggplot2)) install.packages('ggplot2')
 library(ggplot2)
+
 if(!require(plotly)) install.packages('plotly')
 library(plotly)
+
 if(!require(RColorBrewer)) install.packages('RColorBrewer')
 library(RColorBrewer)
+
 if(!require(rgdal)) install.packages('rgdal')
 library(rgdal)
+
 if(!require(dplyr)) install.packages('dplyr')
 library(dplyr)
 
-file_pdf <- pdf_text("pdf/total-por-municipio.pdf") %>% read_lines()
+file_pdf_path <- "../pdf/total-por-municipio.pdf"
+file_pdf <- pdf_text(file_pdf_path) %>% read_lines()
 file_pdf <- file_pdf[-(grep("QUANTIDADE", file_pdf))]
 file_pdf <- file_pdf[-(grep("Página", file_pdf))]
 file_pdf <- file_pdf[-(grep("Quantidade", file_pdf))]
@@ -26,6 +49,7 @@ file_pdf <- strsplit(file_pdf, "  ")
 list_pdf <- 0
 file_pdf[which((lapply(file_pdf, length)==0) == TRUE)] <- NULL
 a <- 1
+
 for(i in 1:length(file_pdf)){
     info_number <- length(file_pdf[[i]][!stri_isempty(file_pdf[[i]])])
     for(j in 1:info_number){
@@ -90,18 +114,20 @@ for(i in 1:length(list_pdf)){
     }
 }
 
-population_rs <- read.csv2('spreadsheets/table200_pop.csv', skip=6, stringsAsFactors = FALSE, encoding="UTF-8")
-population_rs<-population_rs[-(497:508),]
+population_rs_path <- '../spreadsheets/table200_pop.csv'
+population_rs <- read.csv2(population_rs_path, skip = 6, stringsAsFactors = FALSE, encoding="UTF-8")
+population_rs <- population_rs[-(497:508),]
 colnames(population_rs)[1] <- "Cities"
 colnames(population_rs)[3] <- "Population"
-population_rs<-population_rs[,-2]
+population_rs <- population_rs[,-2]
 
-population_rs[,2]<-gsub("[...]","0",population_rs[,2])
-population_rs[,2]<-gsub("[-]","0",population_rs[,2])
-population_rs[,2]<-as.numeric(as.character(unlist(population_rs[,2])))
-population_rs[,1]<-gsub(" [(]RS[)]","",population_rs[,1])
+population_rs[,2] <- gsub("[...]", "0", population_rs[,2])
+population_rs[,2] <- gsub("[-]", "0", population_rs[,2])
+population_rs[,2] <- as.numeric(as.character(unlist(population_rs[,2])))
+population_rs[,1] <- gsub(" [(]RS[)]", "", population_rs[,1])
 
-shape_rs <- readOGR("shapes/Municipios_IBGE.shp", "Municipios_IBGE",use_iconv=TRUE, encoding="UTF-8")
+shape_rs_path <- "../shapes/Municipios_IBGE.shp"
+shape_rs <- readOGR(shape_rs_path, "Municipios_IBGE", use_iconv = TRUE, encoding = "UTF-8")
 
 shape_rs@data[!shape_rs@data$Label_N %in% population_rs$Cities,]
 
@@ -529,33 +555,49 @@ data_pdf$OccupationalTherapist[data_pdf$City=="sao joao da urtiga"] <- 0
 
 shape_rs<-sp::merge(shapefile_df, data_pdf, by.x="NOME", by.y="City")
 
-quantile( shape_rs$Physiotherapist[shape_rs$Physiotherapist>=0], p = (0:5)/5 )
+quantile( shape_rs$Physiotherapist[shape_rs$Physiotherapist >= 0], p = (0:5) / 5 )
 
-shape_rs$PopulationPerPhysio <- shape_rs$Population/(shape_rs$Physiotherapist+1)
-quantile( shape_rs$PopulationPerPhysio[shape_rs$PopulationPerPhysio>=0], p = (0:5)/5 )
+shape_rs$PopulationPerPhysio <- shape_rs$Population / (shape_rs$Physiotherapist+1)
+
+quantile( shape_rs$PopulationPerPhysio[shape_rs$PopulationPerPhysio >= 0], p = (0:5)/5 )
 
 shape_rs$cat <- ifelse(shape_rs$Physiotherapist > 33, 5, ifelse(shape_rs$Physiotherapist > 10, 
     4, ifelse(shape_rs$Physiotherapist > 4, 3, ifelse(shape_rs$Physiotherapist > 2, 2, 1))))
+
 shape_rs$cat <- factor(shape_rs$cat, levels = c(5:1), labels = c("34 - 3498", "11 - 33", 
     "5 - 10", "3 - 4", "0 - 2"))
 
 shape_rs$cat2 <- ifelse(shape_rs$PopulationPerPhysio > 2143, 5, ifelse(shape_rs$PopulationPerPhysio > 1314, 
     4, ifelse(shape_rs$PopulationPerPhysio > 1008, 3, ifelse(shape_rs$PopulationPerPhysio > 742, 2, 1))))
+
 shape_rs$cat2 <- factor(shape_rs$cat2, levels = c(5:1), labels = c("2143 - 43652", "1314 - 2142", 
     "1008 - 1313", "742 - 1007", "0 - 741"))
+
+theme <- theme( legend.position = "bottom", 
+                legend.title = element_text(size = 18, hjust = 0.5, color = "white"),
+                legend.text = element_text(size = 10, color = "white"), 
+                legend.background = element_rect(fill = "black"),
+                plot.title = element_text(size = 18, hjust = 0.5, color = "white"),
+                plot.caption = element_text(color = "white"),
+                plot.background = element_rect(fill = "black"),
+                panel.background = element_rect(fill = "black"),
+                panel.grid.major = element_line(size =.1, color = "grey" ),
+                panel.grid.minor = element_line(size =.1, color = "grey" ),
+                panel.border = element_blank(),
+                axis.text = element_text(color = "white"),
+                axis.title = element_text(color = "white"))
 
 p <- ggplot() +
     geom_polygon( data = shape_rs, aes( fill = cat2, x = long, y = lat, group = group), color = "black", size = 0.1) +
     coord_equal() +
-    theme( legend.position = "bottom", legend.title = element_text( size = 18, hjust = 0.5),
-        legend.text = element_text( size = 14), plot.title = element_text( size = 18, hjust = 0.5)) +
-    labs( x = NULL, y = NULL, title = "Population/Physiotherapists Rate in Rio Grande do Sul - Brazil - Source: Crefito and IBGE, 2019.") +
+    theme +
+    labs( x = "Latitude", y = "Longitude", title = "Population/Physiotherapists Rate in Rio Grande do Sul - Brazil", caption = "Source: Crefito and IBGE, 2019.") +
     scale_fill_manual( values = rev(colorRampPalette(brewer.pal(5, "Spectral"))(5)),
-        name = "People / Physiotherapists Rate",
-        drop = FALSE,
-        guide = guide_legend(
+    name = "People / Physiotherapists Rate",
+    drop = FALSE,
+    guide = guide_legend(
             direction = "horizontal",
-            keyheight = unit( 6, units = "mm"), keywidth = unit( 40, units = "mm"),
+            keyheight = unit( 4, units = "mm"), keywidth = unit( 20, units = "mm"),
             title.position = 'top',
             title.hjust = 0.5,
             label.hjust = 0.5,
@@ -566,20 +608,18 @@ p <- ggplot() +
         )
     )
 
-
 p2 <- ggplot()+
     geom_polygon(data = shape_rs, aes(fill = cat, group = group, x = long, y = lat), color = "black", size = 0.1) +
     coord_equal() +
-    theme(legend.position = "bottom", legend.title = element_text(size = 18, hjust = 0.5),
-        legend.text = element_text(size = 14), plot.title = element_text(size = 18, hjust = 0.5)) +
-    labs(x = NULL, y = NULL, title = "Physiotherapists in Rio Grande do Sul - Brazil - Source: Crefito and IBGE, 2019.") +
+    theme  +
+    labs(x = "Latitude", y = "Longitude", title = "Physiotherapists in Rio Grande do Sul - Brazil", caption = "Source: Crefito and IBGE, 2019.") +
     scale_fill_manual(
         values = rev(colorRampPalette(brewer.pal(5, "Greens"))(5)),
         name = "Physiotherapists Number",
         drop = FALSE,
         guide = guide_legend(
             direction = "horizontal",
-            keyheight = unit(6, units = "mm"),keywidth = unit(40, units = "mm"),
+            keyheight = unit(5, units = "mm"), keywidth = unit(20, units = "mm"),
             title.position = 'top',
             title.hjust = 0.5,
             label.hjust = 0.5,
