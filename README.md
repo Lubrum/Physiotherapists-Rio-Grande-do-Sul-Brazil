@@ -1,3 +1,5 @@
+![GitHub commit activity](https://img.shields.io/github/commit-activity/y/Lubrum/Physiotherapists-Rio-Grande-do-Sul-Brazil) ![GitHub last commit](https://img.shields.io/github/last-commit/Lubrum/Physiotherapists-Rio-Grande-do-Sul-Brazil) ![GitHub repo size](https://img.shields.io/github/repo-size/Lubrum/Physiotherapists-Rio-Grande-do-Sul-Brazil)
+
 # Physiotherapists in Rio Grande do Sul - Brazil
 
 # Summary
