@@ -581,14 +581,14 @@ theme <- theme( legend.position = "bottom",
                 plot.caption = element_text(color = "white"),
                 plot.background = element_rect(fill = "black"),
                 panel.background = element_rect(fill = "black"),
-                panel.grid.major = element_line(size =.1, color = "grey" ),
-                panel.grid.minor = element_line(size =.1, color = "grey" ),
+                panel.grid.major = element_line(linewidth =.1, color = "grey" ),
+                panel.grid.minor = element_line(linewidth =.1, color = "grey" ),
                 panel.border = element_blank(),
                 axis.text = element_text(color = "white"),
                 axis.title = element_text(color = "white"))
 
 p <- ggplot() +
-    geom_polygon( data = shape_rs, aes( fill = cat2, x = long, y = lat, group = group), color = "black", size = 0.1) +
+    geom_polygon( data = shape_rs, aes( fill = cat2, x = long, y = lat, group = group), color = "black", linewidth = 0.1) +
     coord_equal() +
     theme +
     labs( x = "Latitude", y = "Longitude", title = "Population/Physiotherapists Rate in Rio Grande do Sul - Brazil", caption = "Source: Crefito and IBGE, 2019.") +
